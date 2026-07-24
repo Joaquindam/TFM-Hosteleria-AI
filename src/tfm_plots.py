@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Literal
 
 import matplotlib.pyplot as plt
+from src.tfm_theme import apply_theme
+apply_theme()
 import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
