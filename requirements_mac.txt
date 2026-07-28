@@ -112,3 +112,4 @@ statsmodels
 pymupdf
 seaborn
 scikit-learn
+scipy
