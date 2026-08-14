@@ -113,3 +113,4 @@ pymupdf
 seaborn
 scikit-learn
 scipy
+sklearn
