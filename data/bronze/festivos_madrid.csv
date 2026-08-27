@@ -55,3 +55,4 @@ fecha,festivo_nombre,es_festivo,dia_semana,nivel
 2026-04-03,Viernes Santo,1,Viernes,nacional_autonomico
 2026-05-01,Fiesta del Trabajo,1,Viernes,nacional_autonomico
 2026-05-02,Fiesta de la Comunidad de Madrid,1,Sábado,nacional_autonomico
+2026-05-15,San Isidro (festivo local Madrid capital),1,Viernes,local_madrid_capital
