@@ -206,11 +206,16 @@ TARGET_SCHEMAS: dict[str, EntitySchema] = {
         columnas={
             "article_code": "Int64", "article_name": "str",
             "article_short_name": "str", "department_code": "Int64",
+            "department_name": "str",
         },
-        obligatorias=["article_code", "article_name", "department_code"],
+        obligatorias=["article_code", "article_name"],
         estructura="tabla_simple",
         notas="Catálogo maestro de platos/artículos con su departamento. "
-              "Una fila por artículo.",
+              "Una fila por artículo. No todos los restaurantes tienen un "
+              "código numérico de departamento separado — muchos solo traen "
+              "el nombre de categoría como texto (p. ej. 'categoria': "
+              "'Entrantes'); en ese caso mapea a department_name y deja "
+              "department_code vacío, no lo inventes.",
     ),
     "departamentos": EntitySchema(
         columnas={
@@ -545,7 +550,12 @@ razonable en el origen, no la inventes: decláralo en columnas_no_mapeadas.
 notas internas, backups sin relación, o cualquier cosa ajena al dominio del \
 restaurante), llama a registrar_resultado con entidad=null y explica por qué \
 en las notas. Es preferible decir "no lo reconozco" a forzar un mapeo falso.
-9. Llama a registrar_resultado UNA sola vez, al final, con tu conclusión.
+9. Presta atención especial a columnas de fecha de CREACIÓN del registro \
+(p. ej. "fecha_creacion", "created_at", "fecha_alta"), distintas de la \
+fecha del propio evento/reserva/ticket. Suelen pasarse por alto porque no \
+son la fecha más evidente del fichero, pero sí tienen un hueco en el \
+esquema (created_date/created_time) y no deben quedar sin mapear si existen.
+10. Llama a registrar_resultado UNA sola vez, al final, con tu conclusión.
 
 No inventes valores de columnas que no puedas justificar con lo que has \
 visto en el fichero.
@@ -741,6 +751,37 @@ def revisar_y_confirmar(
     return propuestas
 
 
+def _derivar_datetime_combinados(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Deriva columnas '<prefijo>_datetime' combinando '<prefijo>_date' +
+    '<prefijo>_time' cuando la primera quedó vacía tras el mapeo (caso muy
+    habitual: el origen trae fecha y hora en columnas separadas, y ninguna
+    columna de origen mapea directamente a la versión combinada del
+    destino, así que se queda a NA si no se deriva explícitamente).
+
+    Solo actúa si la columna combinada está 100% vacía Y hay datos en
+    fecha/hora de los que derivarla — nunca sobrescribe un valor ya
+    poblado por el mapeo del agente.
+    """
+    df = df.copy()
+    columnas_datetime = [c for c in df.columns if c.endswith("_datetime")]
+    for col_dt in columnas_datetime:
+        prefijo = col_dt[: -len("_datetime")]
+        col_fecha, col_hora = f"{prefijo}_date", f"{prefijo}_time"
+        if col_fecha not in df.columns or col_hora not in df.columns:
+            continue
+        if not df[col_dt].isna().all():
+            continue  # ya tiene datos, no tocar
+        if not df[col_fecha].notna().any():
+            continue  # tampoco hay fecha de la que derivar, nada que hacer
+
+        fecha_str = pd.to_datetime(df[col_fecha], errors="coerce").dt.strftime("%Y-%m-%d")
+        hora_str = df[col_hora].astype("string").fillna("00:00")
+        combinado = fecha_str.fillna("") + " " + hora_str
+        df[col_dt] = pd.to_datetime(combinado, errors="coerce")
+    return df
+
+
 def aplicar_mapeo(propuesta: MappingProposal) -> pd.DataFrame:
     """
     Ejecuta de forma determinista (sin LLM) el mapeo ya aprobado por un
@@ -779,7 +820,8 @@ def aplicar_mapeo(propuesta: MappingProposal) -> pd.DataFrame:
     else:
         resultado = _mapear_fichero_individual(path, propuesta, schema)
 
-    return _coercionar_tipos(resultado, schema, dayfirst=propuesta.formato_fecha_dia_primero)
+    resultado = _coercionar_tipos(resultado, schema, dayfirst=propuesta.formato_fecha_dia_primero)
+    return _derivar_datetime_combinados(resultado)
 
 
 def _mapear_fichero_individual(
@@ -801,6 +843,35 @@ def _mapear_fichero_individual(
     for col in columnas_destino:
         if col not in datos.columns:
             datos[col] = pd.NA
+
+    # ── Columnas del origen no consumidas por el mapeo ──────────────────────
+    # No se descartan: cualquier columna del origen que no tenga hueco en el
+    # esquema fijo de Bronze (p. ej. email/nombre/apellido en reservas, o
+    # comensales/metodo_pago en tickets) se conserva en una columna lateral
+    # `datos_extra` (JSON por fila), para no perder información real solo
+    # porque el contrato de "la Roca" no la contemplaba. El esquema Bronze
+    # en sí no cambia, así que nada de lo que ya funciona (02b, Gold...) se
+    # ve afectado por esto.
+    columnas_mapeadas_destino = set(propuesta.mapeo_columnas.values())
+    columnas_origen_usadas = set(propuesta.mapeo_columnas.keys())
+    columnas_sobrantes = [
+        c for c in columnas_origen if c not in columnas_origen_usadas
+    ]
+    if columnas_sobrantes:
+        import json as _json
+        datos["datos_extra"] = datos[columnas_sobrantes].apply(
+            lambda fila: _json.dumps(
+                {k: (None if pd.isna(v) else str(v)) for k, v in fila.items()},
+                ensure_ascii=False,
+            ),
+            axis=1,
+        )
+        columnas_destino = columnas_destino + ["datos_extra"]
+        print(
+            f"  [datos_extra] {len(columnas_sobrantes)} columnas del origen sin "
+            f"hueco en el esquema Bronze, conservadas en 'datos_extra': "
+            f"{columnas_sobrantes}"
+        )
 
     if schema.incluye_source_file:
         datos.insert(0, "source_file", path.name)
@@ -943,10 +1014,9 @@ def construir_bronze(
     ]
 
     cliente = anthropic.Anthropic()
-    propuestas = []
-    for i, obj in enumerate(objetivos, start=1):
-        print(f"[{i}/{len(objetivos)}] Analizando {obj.name} ...")
-        propuestas.append(analizar_fichero(str(obj), cliente=cliente, modelo=modelo))
+    propuestas = [
+        analizar_fichero(str(obj), cliente=cliente, modelo=modelo) for obj in objetivos
+    ]
     propuestas = revisar_y_confirmar(propuestas, auto_aprobar_umbral=auto_aprobar_umbral)
 
     resultado: dict[str, pd.DataFrame] = {}
