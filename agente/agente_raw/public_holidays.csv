@@ -1,0 +1,61 @@
+date,holiday,is_holiday,weekday,scope
+2024-01-01,New Year,1,Monday,national
+2024-01-06,Epiphany,1,Saturday,national
+2024-03-19,San Jose,1,Tuesday,regional
+2024-05-01,Labour Day,1,Wednesday,national
+2024-05-02,Comunidad de Madrid Day,1,Thursday,regional
+2024-08-15,Assumption,1,Thursday,national
+2024-10-12,National Day,1,Saturday,national
+2024-11-01,All Saints,1,Friday,national
+2024-12-06,Constitution Day,1,Friday,national
+2024-12-08,Immaculate Conception,1,Sunday,national
+2024-12-25,Christmas,1,Wednesday,national
+2024-04-02,Jueves Santo,1,Tuesday,regional
+2024-04-03,Viernes Santo,1,Wednesday,regional
+2024-09-09,Fiesta local - patron,1,Monday,local
+2024-05-30,Fiesta local - vendimia,1,Thursday,local
+2025-01-01,New Year,1,Wednesday,national
+2025-01-06,Epiphany,1,Monday,national
+2025-03-19,San Jose,1,Wednesday,regional
+2025-05-01,Labour Day,1,Thursday,national
+2025-05-02,Comunidad de Madrid Day,1,Friday,regional
+2025-08-15,Assumption,1,Friday,national
+2025-10-12,National Day,1,Sunday,national
+2025-11-01,All Saints,1,Saturday,national
+2025-12-06,Constitution Day,1,Saturday,national
+2025-12-08,Immaculate Conception,1,Monday,national
+2025-12-25,Christmas,1,Thursday,national
+2025-04-02,Jueves Santo,1,Wednesday,regional
+2025-04-03,Viernes Santo,1,Thursday,regional
+2025-09-09,Fiesta local - patron,1,Tuesday,local
+2025-05-30,Fiesta local - vendimia,1,Friday,local
+2026-01-01,New Year,1,Thursday,national
+2026-01-06,Epiphany,1,Tuesday,national
+2026-03-19,San Jose,1,Thursday,regional
+2026-05-01,Labour Day,1,Friday,national
+2026-05-02,Comunidad de Madrid Day,1,Saturday,regional
+2026-08-15,Assumption,1,Saturday,national
+2026-10-12,National Day,1,Monday,national
+2026-11-01,All Saints,1,Sunday,national
+2026-12-06,Constitution Day,1,Sunday,national
+2026-12-08,Immaculate Conception,1,Tuesday,national
+2026-12-25,Christmas,1,Friday,national
+2026-04-02,Jueves Santo,1,Thursday,regional
+2026-04-03,Viernes Santo,1,Friday,regional
+2026-09-09,Fiesta local - patron,1,Wednesday,local
+2026-05-30,Fiesta local - vendimia,1,Saturday,local
+2027-01-01,New Year,1,Friday,national
+2027-01-06,Epiphany,1,Wednesday,national
+2027-03-19,San Jose,1,Friday,regional
+2027-05-01,Labour Day,1,Saturday,national
+2027-05-02,Comunidad de Madrid Day,1,Sunday,regional
+2027-08-15,Assumption,1,Sunday,national
+2027-10-12,National Day,1,Tuesday,national
+2027-11-01,All Saints,1,Monday,national
+2027-12-06,Constitution Day,1,Monday,national
+2027-12-08,Immaculate Conception,1,Wednesday,national
+2027-12-25,Christmas,1,Saturday,national
+2027-04-02,Jueves Santo,1,Friday,regional
+2027-04-03,Viernes Santo,1,Saturday,regional
+2027-09-09,Fiesta local - patron,1,Thursday,local
+2027-05-30,Fiesta local - vendimia,1,Sunday,local

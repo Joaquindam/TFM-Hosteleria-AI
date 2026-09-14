@@ -1,0 +1,96 @@
+fecha,evento,categoria
+2025-09-04,Concierto Plaza Mayor 0,ferial
+2025-09-07,Concierto Plaza Mayor 1,cultural
+2025-09-07,Feria del Libro 2,gastronomico
+2025-09-12,Festival de Jazz 3,gastronomico
+2025-09-15,Feria del Libro 4,ferial
+2025-09-26,Feria de Muestras 5,cultural
+2025-09-30,Verbena de barrio 6,gastronomico
+2025-10-05,Semifinal Copa local 7,deportivo
+2025-10-10,Concierto Plaza Mayor 8,deportivo
+2025-10-14,Verbena de barrio 9,ferial
+2025-10-16,Mercado gastronomico 10,musica
+2025-10-20,Verbena de barrio 11,musica
+2025-10-22,Maraton popular 12,cultural
+2025-10-23,Feria de Muestras 13,ferial
+2025-10-24,Concierto Plaza Mayor 14,musica
+2025-10-26,Verbena de barrio 15,cultural
+2025-10-27,Maraton popular 16,gastronomico
+2025-10-29,Mercado gastronomico 17,cultural
+2025-11-03,Concierto Plaza Mayor 18,deportivo
+2025-11-04,Festival de Jazz 19,ferial
+2025-11-05,Maraton popular 20,deportivo
+2025-11-08,Concierto Plaza Mayor 21,musica
+2025-11-10,Feria de Muestras 22,cultural
+2025-11-30,Semifinal Copa local 23,gastronomico
+2025-12-04,Semifinal Copa local 24,deportivo
+2025-12-04,Feria del Libro 25,cultural
+2025-12-05,Festival de Jazz 26,musica
+2025-12-10,Maraton popular 27,musica
+2025-12-15,Feria de Muestras 28,cultural
+2025-12-17,Verbena de barrio 29,ferial
+2025-12-20,Festival de Jazz 30,cultural
+2025-12-26,Concierto Plaza Mayor 31,ferial
+2025-12-27,Verbena de barrio 32,gastronomico
+2025-12-31,Concierto Plaza Mayor 33,deportivo
+2025-12-31,Verbena de barrio 34,cultural
+2025-12-31,Feria del Libro 35,gastronomico
+2026-01-16,Mercado gastronomico 36,cultural
+2026-01-19,Semifinal Copa local 37,deportivo
+2026-01-28,Feria de Muestras 38,musica
+2026-01-28,Mercado gastronomico 39,musica
+2026-02-07,Concierto Plaza Mayor 40,musica
+2026-02-12,Concierto Plaza Mayor 41,deportivo
+2026-02-18,Semifinal Copa local 42,musica
+2026-02-19,Feria del Libro 43,musica
+2026-03-03,Concierto Plaza Mayor 44,gastronomico
+2026-03-03,Semifinal Copa local 45,cultural
+2026-03-10,Mercado gastronomico 46,cultural
+2026-03-18,Maraton popular 47,ferial
+2026-03-20,Festival de Jazz 48,cultural
+2026-03-23,Feria de Muestras 49,ferial
+2026-03-25,Concierto Plaza Mayor 50,ferial
+2026-03-25,Verbena de barrio 51,cultural
+2026-03-25,Semifinal Copa local 52,deportivo
+2026-03-27,Feria del Libro 53,ferial
+2026-04-10,Verbena de barrio 54,musica
+2026-04-10,Concierto Plaza Mayor 55,ferial
+2026-04-13,Feria de Muestras 56,cultural
+2026-04-13,Feria del Libro 57,cultural
+2026-04-25,Mercado gastronomico 58,ferial
+2026-04-26,Festival de Jazz 59,cultural
+2026-04-27,Semifinal Copa local 60,musica
+2026-04-29,Mercado gastronomico 61,ferial
+2026-05-10,Concierto Plaza Mayor 62,cultural
+2026-05-15,Semifinal Copa local 63,gastronomico
+2026-05-20,Maraton popular 64,cultural
+2026-05-21,Maraton popular 65,ferial
+2026-05-26,Maraton popular 66,musica
+2026-06-02,Festival de Jazz 67,deportivo
+2026-06-03,Concierto Plaza Mayor 68,ferial
+2026-06-09,Maraton popular 69,musica
+2026-06-10,Feria del Libro 70,musica
+2026-06-15,Feria del Libro 71,gastronomico
+2026-06-21,Maraton popular 72,ferial
+2026-06-22,Maraton popular 73,ferial
+2026-07-02,Maraton popular 74,deportivo
+2026-07-03,Verbena de barrio 75,cultural
+2026-07-05,Feria del Libro 76,cultural
+2026-07-09,Mercado gastronomico 77,deportivo
+2026-07-10,Verbena de barrio 78,cultural
+2026-07-13,Concierto Plaza Mayor 79,musica
+2026-07-18,Maraton popular 80,gastronomico
+2026-07-19,Mercado gastronomico 81,deportivo
+2026-07-21,Feria de Muestras 82,musica
+2026-07-24,Semifinal Copa local 83,musica
+2026-08-01,Verbena de barrio 84,cultural
+2026-08-02,Festival de Jazz 85,ferial
+2026-08-06,Mercado gastronomico 86,musica
+2026-08-13,Concierto Plaza Mayor 87,gastronomico
+2026-08-14,Semifinal Copa local 88,cultural
+2026-08-17,Semifinal Copa local 89,deportivo
+2026-08-27,Maraton popular 90,gastronomico
+2026-08-27,Festival de Jazz 91,gastronomico
+2026-08-29,Concierto Plaza Mayor 92,deportivo
+2026-08-30,Concierto Plaza Mayor 93,gastronomico
+2026-08-30,Feria de Muestras 94,deportivo
