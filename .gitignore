@@ -221,3 +221,10 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 .DS_Store
+
+# Datos del restaurante (bronze/silver/gold, incluida reservas.db): nunca en
+# el historial de Git -- clausula de confidencialidad del acuerdo del TFM
+# (docs/TFM_contract.pdf, punto 8) y CLAUDE.md.
+data/
+*.db
+
