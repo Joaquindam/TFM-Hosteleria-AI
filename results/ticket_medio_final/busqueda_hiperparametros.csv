@@ -1,0 +1,10 @@
+modelo,MAE_CV_busqueda,mejores_parametros
+Random Forest,18.03067595130758,"{'model__n_estimators': 600, 'model__min_samples_leaf': 2, 'model__max_features': 1.0, 'model__max_depth': 6}"
+Gradient Boosting,18.34316881510917,"{'model__subsample': 0.7, 'model__n_estimators': 100, 'model__min_samples_leaf': 1, 'model__max_depth': 3, 'model__learning_rate': 0.03}"
+XGBoost,18.497056647523618,"{'model__subsample': 0.8, 'model__reg_lambda': 2, 'model__reg_alpha': 0.1, 'model__n_estimators': 400, 'model__max_depth': 3, 'model__learning_rate': 0.05, 'model__colsample_bytree': 0.6}"
+Extra Trees,18.760795181347987,"{'model__n_estimators': 200, 'model__min_samples_leaf': 1, 'model__max_features': 0.5, 'model__max_depth': None}"
+HistGradientBoosting,19.824030917768816,"{'model__max_leaf_nodes': 15, 'model__max_iter': 100, 'model__max_depth': 5, 'model__learning_rate': 0.03, 'model__l2_regularization': 0.5}"
+Ridge,22.435257895249908,{'model__alpha': 300}
+ElasticNet,22.901832142440565,"{'model__alpha': 10, 'model__l1_ratio': 0.3}"
+Lasso,24.566481057122495,{'model__alpha': 3}
+Linear Regression,179.09143544161324,{}
