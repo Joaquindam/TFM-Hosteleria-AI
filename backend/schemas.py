@@ -40,3 +40,13 @@ class NoShowRequest(BaseModel):
     zone: Optional[str] = None  # "Sala" | "Terraza Cubierta"; por defecto "Sala"
     antelacion_horas: float = Field(gt=0)
     reservas_mismo_dia_turno: Optional[int] = None
+
+
+class LLMAppChatMessage(BaseModel):
+    role: str  # "user" | "assistant"
+    content: str
+
+
+class LLMAppChatRequest(BaseModel):
+    message: str
+    history: list[LLMAppChatMessage] = Field(default_factory=list)

@@ -5,7 +5,7 @@ No se recalcula SHAP en caliente -- ver PROJECT_BRIEF.md seccion 6.
 
 Devuelve datos estructurados (variable, impacto, valor de este dia,
 si es alto/bajo/tipico frente al historico). Traducirlo a lenguaje de
-gerente es responsabilidad del Agent (Fase 4), no de esta capa.
+gerente es responsabilidad del LLM app (Fase 4), no de esta capa.
 """
 from __future__ import annotations
 

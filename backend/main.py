@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from backend import reservas_store
-from backend.routers import events, forecast, noshow, reservations, reviews, sales, weather
+from backend.routers import events, forecast, llm_app, noshow, reservations, reviews, sales, weather
 
 app = FastAPI(title="Restaurant Intelligence API")
 
@@ -23,3 +23,4 @@ app.include_router(reservations.router)
 app.include_router(weather.router)
 app.include_router(events.router)
 app.include_router(reviews.router)
+app.include_router(llm_app.router)
