@@ -5,7 +5,7 @@ Objetivo
 --------
 Dado un fichero o carpeta de datos de un restaurante distinto al del TFM
 (formato, idioma de columnas y estructura desconocidos), producir los mismos
-13 parquet de Bronze que genera `01_ingesta_bronze.ipynb` para el
+13 parquet de Bronze que genera hoy `01_ingesta_bronze.ipynb` para el
 restaurante original: reservas, tickets, ventas, tips, articulos,
 departamentos, menu, festivos, eventos, meteo_diaria, meteo_horaria,
 total_articles y facturas.
@@ -27,7 +27,7 @@ robusto que parsear el texto del modelo a mano, y es el ReAct real, solo que
 implementado por el proveedor en vez de por nosotros.
 
 Tools que el agente puede usar (todas deterministas, de solo lectura):
-    - list_target_entities    : qué 13 entidades existen y qué representan.
+    - list_target_entities   : qué 13 entidades existen y qué representan.
     - peek_file               : cabecera + muestra de filas de un fichero.
     - peek_folder             : listado de una carpeta + muestra del primer
                                  fichero (para el caso "ventas", que es una
@@ -231,7 +231,7 @@ TARGET_SCHEMAS: dict[str, EntitySchema] = {
     ),
     "festivos": EntitySchema(
         columnas={
-            "fecha": "date", "festivo_nombre": "str", "es_festivo": "int",
+            "fecha": "str", "festivo_nombre": "str", "es_festivo": "int",
             "dia_semana": "str", "nivel": "str",
         },
         obligatorias=["fecha", "festivo_nombre"],
@@ -242,7 +242,7 @@ TARGET_SCHEMAS: dict[str, EntitySchema] = {
     ),
     "eventos": EntitySchema(
         columnas={
-            "event_id": "str", "fecha_inicio": "date", "fecha_fin": "date",
+            "event_id": "str", "fecha_inicio": "str", "fecha_fin": "str",
             "nombre_evento": "str", "categoria": "str", "subcategoria": "str",
             "ambito": "str", "ubicacion": "str", "proximidad_la_roca": "str",
             "impacto_esperado": "str", "intensidad_sugerida": "int",
@@ -261,7 +261,7 @@ TARGET_SCHEMAS: dict[str, EntitySchema] = {
     ),
     "meteo_diaria": EntitySchema(
         columnas={
-            "date": "date", "temperature_2m_mean (°C)": "float",
+            "date": "str", "temperature_2m_mean (°C)": "float",
             "temperature_2m_max (°C)": "float", "temperature_2m_min (°C)": "float",
             "precipitation_sum (mm)": "float", "rain_sum (mm)": "float",
             "precipitation_hours (h)": "float", "wind_speed_10m_max (km/h)": "float",
@@ -287,7 +287,7 @@ TARGET_SCHEMAS: dict[str, EntitySchema] = {
         columnas={
             "ticket_id": "str", "archivo_pdf": "str", "ruta_pdf": "str",
             "restaurante": "str", "cif": "str", "telefono": "str", "mesa": "str",
-            "fecha": "date", "hora": "str", "base": "float",
+            "fecha": "str", "hora": "str", "base": "float",
             "porcentaje_iva": "float", "iva": "float", "total": "float",
             "efectivo": "float", "tarjeta": "float", "num_items": "int",
             "suma_items": "float", "diferencia_total_vs_items": "float",
@@ -314,6 +314,7 @@ class MappingProposal:
     mapeo_columnas: dict[str, str]
     columnas_no_mapeadas: list[str]
     notas: str
+    formato_fecha_dia_primero: bool = True  # español por defecto; el agente lo confirma
     aprobado: bool = False  # se marca True solo tras revisión humana
 
 
@@ -482,8 +483,15 @@ _TOOL_RESULTADO = {
             "confianza": {"type": "number", "minimum": 0, "maximum": 1},
             "fila_inicio_tabla": {
                 "type": "integer",
-                "description": "Índice (0-based) de la fila donde empieza la tabla de "
-                                "datos real, ignorando cabeceras de metadatos.",
+                "description": "Índice (0-based) de la FILA QUE CONTIENE LOS NOMBRES DE "
+                                "COLUMNA (la cabecera), no la primera fila de datos. Si la "
+                                "cabecera está en la fila 0, este valor es 0, no 1.",
+            },
+            "formato_fecha_dia_primero": {
+                "type": "boolean",
+                "description": "true si las fechas del origen van en formato dia/mes/año, "
+                                "false si van en mes/dia/año. Obligatorio si el mapeo incluye "
+                                "alguna columna de fecha.",
             },
             "metadatos": {
                 "type": "object",
@@ -533,11 +541,11 @@ esos metadatos tú mismo del texto, sea cual sea el idioma o la etiqueta \
 exacta que use el fichero.
 5. Si una columna obligatoria del destino no tiene ninguna correspondencia \
 razonable en el origen, no la inventes: decláralo en columnas_no_mapeadas.
-6. Si el fichero no encaja con ninguna de las 13 entidades (por ejemplo, \
+8. Si el fichero no encaja con ninguna de las 13 entidades (por ejemplo, \
 notas internas, backups sin relación, o cualquier cosa ajena al dominio del \
 restaurante), llama a registrar_resultado con entidad=null y explica por qué \
 en las notas. Es preferible decir "no lo reconozco" a forzar un mapeo falso.
-7. Llama a registrar_resultado UNA sola vez, al final, con tu conclusión.
+9. Llama a registrar_resultado UNA sola vez, al final, con tu conclusión.
 
 No inventes valores de columnas que no puedas justificar con lo que has \
 visto en el fichero.
@@ -624,6 +632,7 @@ def analizar_fichero(
                 mapeo_columnas=propuesta_final.get("mapeo_columnas", {}) or {},
                 columnas_no_mapeadas=propuesta_final.get("columnas_no_mapeadas", []) or [],
                 notas=propuesta_final.get("notas", ""),
+                formato_fecha_dia_primero=propuesta_final.get("formato_fecha_dia_primero", True),
             )
 
     # Se agotaron las iteraciones sin resultado -> tratar como no reconocido,
@@ -636,6 +645,19 @@ def analizar_fichero(
     )
 
 
+def _cabecera_real(path: Path, fila_inicio_tabla: int) -> list[str]:
+    """Lee la fila que el agente dice que es la cabecera y la devuelve tal
+    cual, para poder validar el mapeo propuesto contra la realidad del
+    fichero antes de que un humano lo apruebe a ciegas."""
+    if path.is_dir():
+        ficheros = sorted(
+            f for f in path.iterdir() if f.suffix.lower() in {".csv", ".xls", ".xlsx"}
+        )
+        path = ficheros[0]
+    raw = _leer_crudo(path, filas=fila_inicio_tabla + 1)
+    return [str(c) for c in raw.iloc[fila_inicio_tabla].tolist()]
+
+
 def revisar_y_confirmar(
     propuestas: list[MappingProposal],
     auto_aprobar_umbral: float | None = None,
@@ -645,15 +667,21 @@ def revisar_y_confirmar(
     nada. Este paso es obligatorio: `construir_bronze` no procesa ninguna
     propuesta con `aprobado=False`.
 
+    Valida, ADEMÁS, que las claves de `mapeo_columnas` existan literalmente
+    en la cabecera real del fichero (según `fila_inicio_tabla`). Si alguna
+    clave no coincide byte a byte, se avisa en rojo antes de preguntar si
+    se aprueba — un mapeo con claves que no casan produce columnas 100%
+    nulas de forma silenciosa si se aprueba sin revisar esto.
+
     Parameters
     ----------
     propuestas : list[MappingProposal]
         Salida de `analizar_fichero` para uno o varios ficheros.
     auto_aprobar_umbral : float, optional
-        Si se indica, las propuestas con confianza >= umbral se marcan
-        como aprobadas automáticamente; el resto queda pendiente de
-        revisión manual. Si es None (por defecto), TODO requiere revisión
-        manual explícita — recomendado mientras se está validando el agente.
+        Si se indica, las propuestas con confianza >= umbral Y sin
+        discrepancias de cabecera se marcan como aprobadas automáticamente;
+        el resto queda pendiente de revisión manual. Si es None (por
+        defecto), TODO requiere revisión manual explícita.
 
     Returns
     -------
@@ -667,18 +695,44 @@ def revisar_y_confirmar(
             print(f"No reconocido. Motivo: {p.notas}")
             continue
         print(f"Fila de inicio de la tabla: {p.fila_inicio_tabla}")
+        print(f"Formato de fecha día-primero: {p.formato_fecha_dia_primero}")
         if p.metadatos:
             print(f"Metadatos detectados: {p.metadatos}")
+
+        try:
+            cabecera_real = _cabecera_real(Path(p.fichero), p.fila_inicio_tabla)
+        except Exception as exc:  # no bloquear la revisión si esto falla
+            cabecera_real = None
+            print(f"(No se pudo releer la cabecera para validar: {exc})")
+
+        claves_no_encontradas = []
+        if cabecera_real is not None:
+            claves_no_encontradas = [
+                k for k in p.mapeo_columnas if k not in cabecera_real
+            ]
+
         print("Mapeo de columnas propuesto:")
         for origen, destino in p.mapeo_columnas.items():
-            print(f"   {origen!r:35s} -> {destino}")
+            marca = " <-- NO EXISTE EN LA CABECERA REAL" if origen in claves_no_encontradas else ""
+            print(f"   {origen!r:35s} -> {destino}{marca}")
+
+        if claves_no_encontradas:
+            print(f"\n*** ATENCIÓN: {len(claves_no_encontradas)} clave(s) del mapeo no "
+                  f"coinciden con ninguna columna real de la cabecera detectada. "
+                  f"Si apruebas esto, esas columnas de destino saldrán vacías. ***")
+            print(f"Cabecera real leída: {cabecera_real}")
+
         if p.columnas_no_mapeadas:
             print(f"Columnas obligatorias SIN correspondencia: {p.columnas_no_mapeadas}")
         print(f"Notas del agente: {p.notas}")
 
-        if auto_aprobar_umbral is not None and p.confianza >= auto_aprobar_umbral:
+        if (
+            auto_aprobar_umbral is not None
+            and p.confianza >= auto_aprobar_umbral
+            and not claves_no_encontradas
+        ):
             p.aprobado = True
-            print(">> Aprobado automáticamente (confianza suficiente).")
+            print(">> Aprobado automáticamente (confianza suficiente y cabecera coincide).")
             continue
 
         respuesta = input("¿Aprobar este mapeo? [y/N]: ").strip().lower()
@@ -725,7 +779,7 @@ def aplicar_mapeo(propuesta: MappingProposal) -> pd.DataFrame:
     else:
         resultado = _mapear_fichero_individual(path, propuesta, schema)
 
-    return _coercionar_tipos(resultado, schema)
+    return _coercionar_tipos(resultado, schema, dayfirst=propuesta.formato_fecha_dia_primero)
 
 
 def _mapear_fichero_individual(
@@ -736,8 +790,10 @@ def _mapear_fichero_individual(
     else:
         raw = pd.read_csv(path, header=None, engine="python", sep=None)
 
-    columnas_origen = raw.iloc[propuesta.fila_inicio_tabla].tolist()
-    datos = raw.iloc[propuesta.fila_inicio_tabla + 1:].copy()
+    fila = _corregir_fila_cabecera(raw, propuesta.fila_inicio_tabla, propuesta.mapeo_columnas)
+
+    columnas_origen = raw.iloc[fila].tolist()
+    datos = raw.iloc[fila + 1:].copy()
     datos.columns = columnas_origen
     datos = datos.rename(columns=propuesta.mapeo_columnas)
 
@@ -757,23 +813,94 @@ def _mapear_fichero_individual(
     return datos[columnas_destino].reset_index(drop=True)
 
 
-def _coercionar_tipos(df: pd.DataFrame, schema: EntitySchema) -> pd.DataFrame:
+def _corregir_fila_cabecera(
+    raw: pd.DataFrame, fila_propuesta: int, mapeo_columnas: dict[str, str],
+) -> int:
+    """
+    Salvaguarda determinista contra el error más frecuente del agente: usar
+    la primera fila de DATOS en vez de la fila de CABECERA como
+    `fila_inicio_tabla`, pese a la aclaración del prompt. Se detecta porque,
+    si la fila elegida es la correcta, sus valores deberían coincidir con
+    las claves de `mapeo_columnas`; si no coincide ninguna, se prueba con
+    la fila de arriba y la de abajo y se usa la que mejor encaje.
+    """
+    origen_esperado = {str(c).strip().lower() for c in mapeo_columnas.keys()}
+    if not origen_esperado:
+        return fila_propuesta
+
+    def _solape(idx: int) -> int:
+        if idx < 0 or idx >= len(raw):
+            return -1
+        fila_valores = {str(v).strip().lower() for v in raw.iloc[idx].tolist()}
+        return len(origen_esperado & fila_valores)
+
+    candidatas = [fila_propuesta, fila_propuesta - 1, fila_propuesta + 1]
+    solapes = [(idx, _solape(idx)) for idx in candidatas if _solape(idx) >= 0]
+    mejor_fila, mejor_solape = max(solapes, key=lambda x: x[1])
+
+    if mejor_fila != fila_propuesta and mejor_solape > 0:
+        print(
+            f"  [auto-corrección] fila_inicio_tabla propuesta={fila_propuesta} no "
+            f"coincidía con ninguna columna del mapeo; usando fila={mejor_fila} "
+            f"({mejor_solape} coincidencias)."
+        )
+        return mejor_fila
+    return fila_propuesta
+
+
+def _parsear_fecha_robusto(serie: pd.Series, dayfirst_sugerido: bool) -> pd.Series:
+    """
+    Convierte una columna a datetime probando dayfirst=True y dayfirst=False,
+    y se queda con el que produzca menos valores nulos.
+
+    Es necesario porque `dayfirst` no es un ajuste neutro: aplicado a un
+    formato ISO (año-mes-día, ya sin ambigüedad) puede ROMPER filas válidas
+    en vez de ignorarlas — p. ej. "2025-01-13" con dayfirst=True puede
+    interpretarse como día=01/mes=13, un mes imposible, y descartarse como
+    nulo. Probar ambas y quedarnos con la de menos nulos es más fiable que
+    fiarnos de un único valor, venga de donde venga.
+    """
+    opcion_a = pd.to_datetime(serie, errors="coerce", dayfirst=dayfirst_sugerido)
+    opcion_b = pd.to_datetime(serie, errors="coerce", dayfirst=not dayfirst_sugerido)
+    nulos_a, nulos_b = opcion_a.isna().sum(), opcion_b.isna().sum()
+    return opcion_a if nulos_a <= nulos_b else opcion_b
+
+
+def _coercionar_tipos(
+    df: pd.DataFrame, schema: EntitySchema, dayfirst: bool = True,
+) -> pd.DataFrame:
     """Aplica los dtypes esperados con errors='coerce' (nunca lanza excepción
-    por un valor que no convierte; lo deja como nulo y sigue)."""
+    por un valor que no convierte; lo deja como nulo y sigue).
+
+    Parameters
+    ----------
+    dayfirst : bool, default=True
+        Si las columnas de fecha están en formato día/mes/año (True, el caso
+        más común en datos de restaurantes españoles) o mes/día/año (False).
+        Viene de lo que el propio agente detectó para ese fichero
+        (`propuesta.formato_fecha_dia_primero`), no es una suposición fija.
+    """
     df = df.copy()
     for columna, tipo in schema.columnas.items():
         if columna not in df.columns:
             continue
-        if tipo in {"datetime", "date"}:
-            df[columna] = pd.to_datetime(df[columna], errors="coerce")
+        if tipo == "datetime":
+            df[columna] = _parsear_fecha_robusto(df[columna], dayfirst_sugerido=dayfirst)
         elif tipo == "float":
-            df[columna] = pd.to_numeric(df[columna], errors="coerce")
+            df[columna] = pd.to_numeric(df[columna], errors="coerce").astype("float64")
         elif tipo == "Int64":
             df[columna] = pd.to_numeric(df[columna], errors="coerce").astype("Int64")
         elif tipo == "int":
             df[columna] = pd.to_numeric(df[columna], errors="coerce").astype("Int64")
         elif tipo == "str":
             df[columna] = df[columna].astype("string")
+        elif tipo == "bool":
+            mapa_bool = {
+                True: True, False: False, "true": True, "false": False,
+                "True": True, "False": False, "1": True, "0": False,
+                1: True, 0: False, "sí": True, "si": True, "no": False,
+            }
+            df[columna] = df[columna].map(mapa_bool).astype("boolean")
     return df
 
 
@@ -816,9 +943,10 @@ def construir_bronze(
     ]
 
     cliente = anthropic.Anthropic()
-    propuestas = [
-        analizar_fichero(str(obj), cliente=cliente, modelo=modelo) for obj in objetivos
-    ]
+    propuestas = []
+    for i, obj in enumerate(objetivos, start=1):
+        print(f"[{i}/{len(objetivos)}] Analizando {obj.name} ...")
+        propuestas.append(analizar_fichero(str(obj), cliente=cliente, modelo=modelo))
     propuestas = revisar_y_confirmar(propuestas, auto_aprobar_umbral=auto_aprobar_umbral)
 
     resultado: dict[str, pd.DataFrame] = {}
@@ -842,13 +970,67 @@ def construir_bronze(
     return resultado
 
 
+def _elegir_carpeta_entrada() -> str:
+    """
+    Abre un selector nativo de carpeta (Finder en Mac, Explorador en
+    Windows, vía tkinter) y devuelve la ruta elegida por el usuario.
+ 
+    Esta función es deliberadamente independiente de `construir_bronze`:
+    esta última sigue aceptando `ruta_entrada` como string normal, para que
+    el día de mañana un backend (SaaS, API) pueda llamarla directamente con
+    la ruta de un fichero recién subido, sin pasar por ningún diálogo
+    gráfico. El selector solo tiene sentido para uso local e interactivo,
+    como el bloque `if __name__ == "__main__":` de abajo.
+ 
+    Si no hay entorno gráfico disponible (tkinter no instalado, o un
+    servidor sin pantalla), recurre a pedir la ruta por teclado en vez de
+    fallar.
+ 
+    Returns
+    -------
+    str
+        Ruta absoluta de la carpeta elegida.
+    """
+    try:
+        import tkinter as tk
+        from tkinter import filedialog
+ 
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)  # evita que el diálogo se abra detrás de otras ventanas
+        carpeta = filedialog.askdirectory(
+            title="Selecciona la carpeta con los datos del restaurante"
+        )
+        root.destroy()
+    except SystemExit:
+        raise
+    except Exception:
+        print(
+            "No se pudo abrir el selector gráfico de carpetas (¿tkinter no "
+            "disponible, o entorno sin pantalla?). Introduce la ruta a mano."
+        )
+        carpeta = input("Ruta de la carpeta de entrada: ").strip()
+ 
+    if not carpeta:
+        raise SystemExit("No se seleccionó ninguna carpeta. Abortando.")
+    return carpeta
+ 
+ 
 if __name__ == "__main__":
-    # Demo mínima de uso manual. Ajusta las rutas antes de ejecutar.
+    # Demo mínima de uso manual.
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise SystemExit(
             "Define ANTHROPIC_API_KEY en el entorno antes de ejecutar este módulo."
         )
+
+    print(f"Selecciona la carpeta donde se encuentran tus ficheros:")
+    ruta_entrada = _elegir_carpeta_entrada()
+    print(f"Carpeta de entrada seleccionada: {ruta_entrada}")
+ 
+    # La salida SÍ se deja fija: pensando en una futura versión SaaS, el
+    # destino de los Bronze generados no debería depender de una elección
+    # manual del usuario en cada ejecución.
     construir_bronze(
-        ruta_entrada="agente/agente_raw",
-        ruta_salida="agente/agente_bronze",
+        ruta_entrada=ruta_entrada,
+        ruta_salida="agente/prueba2_bronze",
     )
