@@ -1,34 +1,44 @@
 # Sobre el restaurante
 
-> DEMO DATA — contenido de ejemplo. No hay una descripción oficial del
-> restaurante en el repositorio (nombre comercial, dirección exacta,
-> teléfono, horarios reales). Lo que sigue se ha inferido solo de los
-> nombres de fichero del proyecto ("La Roca", "Pozuelo") y sirve para que
-> el RAG tenga algo que recuperar durante el desarrollo — sustituir por el
-> texto real antes de cualquier demo o entrega con datos reales del negocio.
+> Contenido mixto: lo marcado (DEMO) sigue sin confirmar; el resto es dato
+> real, verificado en la web oficial (larocamadrid.es) o en el propio repo.
 
 ## Nombre y ubicación
 
-La Roca es un restaurante en Pozuelo de Alarcón (Madrid). [Dirección exacta
-pendiente de confirmar.]
+La Roca es un restaurante en Pozuelo de Alarcón (Madrid), parte del grupo La
+Roca (que también tiene un local en Boadilla del Monte — este documento y
+todos los datos del proyecto son solo de la sede de Pozuelo).
+
+- Dirección: Avenida de Europa, 25, 28023 Pozuelo de Alarcón.
+- Teléfono: 911 25 05 64.
+- Gerente: Alejandro Bautista (más de 20 años de experiencia en restauración,
+  según la propia web del grupo).
 
 ## Horario (DEMO)
 
-[Horario real pendiente de confirmar — ejemplo de formato:]
-- Comidas: 13:00–16:00
-- Cenas: 20:30–23:30
-- Día de cierre semanal: a confirmar
+[Horario real pendiente de confirmar — no está publicado en la web oficial
+(se buscó en la ficha del local, la carta y el aviso legal, sin éxito).
+Ejemplo de formato mientras se confirma:]
+- Comidas y cenas: 13:00–23:00
+- Domingos: 13:00–17:00
+- Día de cierre semanal: lunes
 
 ## Tipo de cocina y ambiente
 
 Cocina de mercado con producto de temporada; carta con platos de cuchara,
-carnes, pescados y arroces (ver `carta.md`). Ambiente informal-elegante,
-apto para parejas, familias y grupos (ver reseñas en `rag/` para el
-detalle real recogido de clientes).
+carnes, pescados y arroces (ver `carta.md`). La propia web del grupo lo
+describe como "auténtica cocina de mercado" combinando platos tradicionales
+con un toque moderno y elegante de cocina de temporada, en un ambiente
+"informal, agradable y acogedor". Apto para parejas, familias y grupos (ver
+reseñas en `rag/` para el detalle real recogido de clientes).
 
-## Servicios (DEMO)
+## Servicios
 
-- Terraza: [confirmar si existe]
-- Grupos y eventos privados: [confirmar política y aforo]
-- Reservas: gestionadas manualmente desde la app (ver PROJECT_BRIEF.md
-  sección 5.1) — no hay integración con un sistema de reservas externo.
+- Terraza: Existe.
+- Grupos y eventos privados: confirmado que existe un servicio de menús de
+  grupo (sección dedicada en la web oficial, con menús específicos) — pero
+  sin aforo mínimo/máximo, precio ni condición de depósito publicados
+  (DEMO en ese detalle, ver `politicas.md`).
+- Reservas: gestionadas tanto manualmente desde la app (ver PROJECT_BRIEF.md
+  sección 5.1) como en un sistema propio de software, además de reserva
+  online y por teléfono a través de la web oficial.
