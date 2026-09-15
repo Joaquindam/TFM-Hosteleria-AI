@@ -7,8 +7,7 @@
 ## Reservas
 
 - Canales confirmados: reserva online desde la web oficial y por teléfono
-  (911 25 05 64, sede de Pozuelo) — además del alta manual desde esta app
-  (ver PROJECT_BRIEF.md sección 5.1).
+  (911 25 05 64, sede de Pozuelo).
 - Se recomienda reservar con antelación, especialmente fines de semana
   (recomendación genérica, no una cifra confirmada por el restaurante).
 - Grupos grandes (10+ personas) — antelación mínima exigida (DEMO, no
