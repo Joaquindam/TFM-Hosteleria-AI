@@ -23,8 +23,7 @@ Pipeline de analítica predictiva sobre los datos operativos de un restaurante d
 │   ├── features.py        # construcción reproducible de las tablas de features
 │   └── revenue_predictor.py
 ├── data/                  # bronze / silver / gold
-├── results/               # métricas, figuras y modelos serializados
-└── docs/
+└── results/               # métricas, figuras y modelos serializados
 ```
 
 ## Sobre la numeración
