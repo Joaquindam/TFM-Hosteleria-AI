@@ -34,7 +34,8 @@ reseñas en `rag/` para el detalle real recogido de clientes).
 
 ## Servicios
 
-- Terraza: Existe.
+- Terraza: Existe. En el interior: Encontrarás una zona de barra con mesas altas y bajas ideales para un tapeo más informal, junto a un comedor principal espacioso pensado para comidas y cenas tradicionales. Esta zona interior concentra la mayor parte de su capacidad total para albergar eventos sentados de hasta 80 personas. En la terraza: Cuenta con una terraza exterior acondicionada con un número amplio de mesas distribuidas para comer al aire libre. Al estar cubierta y adaptada para el clima, la terraza se mantiene operativa y confortable tanto en los meses de invierno como en verano.
+
 - Grupos y eventos privados: confirmado que existe un servicio de menús de
   grupo (sección dedicada en la web oficial, con menús específicos) — pero
   sin aforo mínimo/máximo, precio ni condición de depósito publicados

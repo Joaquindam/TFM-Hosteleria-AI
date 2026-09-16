@@ -47,11 +47,15 @@ if prompt:
                 st.stop()
 
         if resp.status_code == 503:
-            st.warning(
-                "El AI Advisor todavía no está configurado: falta `ANTHROPIC_API_KEY` en el "
-                "archivo `.env` de la raíz del proyecto (ver `.env.example`). Añádela y "
-                "reinicia el backend para activar el chat."
-            )
+            detail = resp.json().get("detail", "")
+            if "GROQ_API_KEY" in detail and "Falta" in detail:
+                st.warning(
+                    "El AI Advisor todavía no está configurado: falta `GROQ_API_KEY` en el "
+                    "archivo `.env` de la raíz del proyecto (ver `.env.example`). Añádela y "
+                    "reinicia el backend para activar el chat."
+                )
+            else:
+                st.warning(f"El AI Advisor no ha podido responder ahora mismo: {detail}")
             st.stop()
         elif not resp.ok:
             st.error(f"Error del backend: {resp.status_code}")

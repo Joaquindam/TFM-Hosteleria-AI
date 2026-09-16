@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from backend.schemas import LLMAppChatRequest
-from llm_app.orchestrator import LLMAppNotConfiguredError, run_chat
+from llm_app_groq.orchestrator import LLMAppNotConfiguredError, LLMAppUnavailableError, run_chat
 
 router = APIRouter(prefix="/llm_app", tags=["llm_app"])
 
@@ -16,4 +16,6 @@ def post_llm_app_chat(payload: LLMAppChatRequest):
         result = run_chat(payload.message, history=history)
         return {"reply": result.reply, "sources": result.sources}
     except LLMAppNotConfiguredError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except LLMAppUnavailableError as e:
         raise HTTPException(status_code=503, detail=str(e))
