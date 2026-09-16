@@ -42,3 +42,67 @@ reseñas en `rag/` para el detalle real recogido de clientes).
 - Reservas: gestionadas tanto manualmente desde la app (ver PROJECT_BRIEF.md
   sección 5.1) como en un sistema propio de software, además de reserva
   online y por teléfono a través de la web oficial.
+
+## MENUS
+
+  ### MENU 1
+
+  - ENTRANTES A COMPARTIR
+
+  Ensaladilla “La Roca” con lomos de ventresca.
+
+  Mejillones a la brasa con salsa Thai.
+
+  Croqueton de cecina XL Black Angus.
+
+  Ravioli de rabo con parmentier y queso pecorino.
+
+  - SEGUNDOS A ESCOGER
+
+  Carrillera Ibérica al vino tinto con patatas fritas en cuadros.
+
+  Chuletitas de lechal a la brasa con pimientos rojos asados al carbón.
+
+  Rodaballo al horno salteado con tirabeques en soja.
+
+  Pulpo a la brasa con patatas cocidas y mahonesa de... (cortado en la imagen)
+
+  - POSTRE
+
+  TARTA DE QUESO
+
+  ### MENÚ 2
+  ENTRANTES A COMPARTIR
+
+  Croquetas de jamón de bellota y leche fresca.
+
+  Alcachofas confitadas, a la brasa sobre parmentier y rabo desmigado.
+
+  Chipirones a la andaluza con huevos fritos con pimentón de Vera.
+
+  SEGUNDOS A ESCOGER
+
+  Carrillera Ibérica al vino tinto con patatas fritas en cuadros.
+
+  Rodaballo al horno salteado con tirabeques en soja.
+
+  - POSTRE
+
+  TARTA DE QUESO
+
+  ### MENÚ 3
+  ENTRANTES A COMPARTIR
+
+  Ensaladilla “La Roca” con lomos de ventresca.
+
+  Croquetas de jamón de bellota y leche fresca.
+
+  Torreznos confitados a baja temperatura con patatas revolconas.
+
+  Tortilla al estilo de “Betanzos”
+
+  Risotto de verduras y queso pecorino
+
+  - POSTRE
+
+  TARTA ÁRABE
